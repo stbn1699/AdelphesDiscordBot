@@ -37,7 +37,7 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 	const addedRoles = newRoles.filter(role => !oldRoles.has(role.id));
 	const removedRoles = oldRoles.filter(role => !newRoles.has(role.id));
 
-	if(addedRoles.has("1348572452372086807")) {
+	if(process.env.POPULACE_ROLE && addedRoles.has(process.env.POPULACE_ROLE)) {
 		welcomeGenerator(newMember.user);
 	}
 });

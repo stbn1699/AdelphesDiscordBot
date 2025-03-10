@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx ts-node src/index.ts",
-    "start:prod": "npx tsc && pm2 start dist/index.js --name adelphes-bot"
+    "start:prod": "npx tsc && pm2 del adelphes-bot && pm2 start dist/index.js --name adelphes-bot"
   },
   "keywords": [],
   "author": "",
