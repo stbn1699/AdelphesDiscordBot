@@ -1,22 +1,36 @@
-import {AttachmentBuilder, Message} from "discord.js";
+import {AttachmentBuilder, Client, Message, TextChannel} from "discord.js";
 import {writeFileSync} from "fs";
 import {tmpdir} from "os";
 import {join} from "path";
 
 let currentMessage: Message;
+let currentClient: Client;
+
+export function setCurrentClient(newClient: Client): void {
+	currentClient = newClient;
+}
 
 export function setCurrentMessage(message: Message): void {
 	currentMessage = message;
 }
 
-export async function sendMessage(text: string): Promise<void> {
-	if (!currentMessage) {
-		console.error("No current message set");
+export async function sendMessage(text: string, channelId?: string): Promise<void> {
+	let channel = currentMessage?.channel;
+
+	if (!channel && channelId) {
+		channel = await currentClient.channels.fetch(channelId) as TextChannel;
+	}
+
+	if (!channel) {
+		console.error("No channel found");
 		return;
 	}
-	const channel = currentMessage.channel;
-	if (!channel.isTextBased() || !("send" in channel)) {
-		console.error("Channel is not text-based or does not support sending messages");
+	if (!channel.isTextBased()) {
+		console.error("Channel is not text-based");
+		return;
+	}
+	if (!("send" in channel)) {
+		console.error("Channel does not support sending messages");
 		return;
 	}
 
@@ -25,7 +39,9 @@ export async function sendMessage(text: string): Promise<void> {
 		writeFileSync(filePath, text);
 		const attachment = new AttachmentBuilder(filePath);
 		await channel.send({files: [attachment]});
+		console.log(`Message is too long, sending as attachment`);
 	} else {
 		await channel.send(text);
+		console.log(`\nMessage sent: ${text}\n`);
 	}
 }

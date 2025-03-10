@@ -45,5 +45,5 @@ export function spinDice(rawDicesParams: string): void {
 	}
 	const total = allvalues.reduce((a, b) => a + b, 0);
 	message = `${message} \n\n\nTotal = ${total}`;
-	sendMessage(message);
+	sendMessage(message)
 }
