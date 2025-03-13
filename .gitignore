@@ -2,3 +2,4 @@
 src/datas/*.json
 /dist
 /node_modules
+/.idea
