@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import {spinDice} from "./commands/spinDices";
 import {sendMessage, setCurrentClient, setCurrentMessage} from "./commands/sendMessage";
 import {welcomeGenerator} from "./commands/welcomeGenerator";
+import {reactionHandler} from "./commands/reactionHandler";
 
 dotenv.config();
 
@@ -29,6 +30,12 @@ client.on("messageCreate", async (message) => {
 	if (message.content.toLowerCase().startsWith("/dice")) {
 		spinDice(message.content);
 	}
+	// Check if the user has the moderator role
+	if (process.env.ROLE_MODERATOR && message.member?.roles.cache.has(process.env.ROLE_MODERATOR)) {
+		if (message.content.toLowerCase().startsWith("/reaction")) {
+			reactionHandler(message);
+		}
+	}
 });
 
 client.on("guildMemberUpdate", (oldMember, newMember) => {
@@ -37,7 +44,7 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 	const addedRoles = newRoles.filter(role => !oldRoles.has(role.id));
 	const removedRoles = oldRoles.filter(role => !newRoles.has(role.id));
 
-	if(process.env.POPULACE_ROLE && addedRoles.has(process.env.POPULACE_ROLE)) {
+	if(process.env.ROLE_POPULACE && addedRoles.has(process.env.ROLE_POPULACE)) {
 		welcomeGenerator(newMember.user);
 	}
 });
