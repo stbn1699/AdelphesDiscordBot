@@ -5,6 +5,7 @@ import {sendMessage, setCurrentClient, setCurrentMessage} from "./commands/sendM
 import {welcomeGenerator} from "./commands/welcomeGenerator";
 import {reactionHandler, reactionHandlerUserRequest} from "./commands/reactionHandler";
 import {onStartup} from "./commands/onStartup";
+import {tickets} from "./commands/tickets";
 
 dotenv.config();
 
@@ -31,6 +32,9 @@ client.on("messageCreate", async (message) => {
 	}
 	if (message.content.toLowerCase().startsWith("/dice")) {
 		spinDice(message.content);
+	}
+	if (message.content.toLowerCase() === "/new") {
+		tickets(message.author);
 	}
 	// Check if the user has the moderator role
 	if (process.env.ROLE_MODERATOR && message.member?.roles.cache.has(process.env.ROLE_MODERATOR)) {
