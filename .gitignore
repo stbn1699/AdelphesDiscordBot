@@ -1,2 +1,4 @@
 .env
 src/datas/*.json
+/dist
+/node_modules
