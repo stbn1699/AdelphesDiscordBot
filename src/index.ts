@@ -42,4 +42,8 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 	}
 });
 
+client.on("guildMemberRemove", (member) => {
+	sendMessage(`Au revoir, <@${member.id}> !`);
+});
+
 client.login(process.env.TOKEN);
