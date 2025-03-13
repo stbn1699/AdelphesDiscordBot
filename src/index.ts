@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import {spinDice} from "./commands/spinDices";
 import {sendMessage, setCurrentClient, setCurrentMessage} from "./commands/sendMessage";
 import {welcomeGenerator} from "./commands/welcomeGenerator";
-import {reactionHandler} from "./commands/reactionHandler";
+import {reactionHandler, reactionHandlerUserRequest} from "./commands/reactionHandler";
+import {onStartup} from "./commands/onStartup";
 
 dotenv.config();
 
@@ -15,9 +16,10 @@ const client = new Client({
 		GatewayIntentBits.GuildMembers
 	]
 });
-setCurrentClient(client)
+	export default client;
 
 client.on("ready", () => {
+	onStartup();
 	console.log(`Bot connecté en tant que ${client.user?.tag}`);
 });
 
@@ -33,7 +35,8 @@ client.on("messageCreate", async (message) => {
 	// Check if the user has the moderator role
 	if (process.env.ROLE_MODERATOR && message.member?.roles.cache.has(process.env.ROLE_MODERATOR)) {
 		if (message.content.toLowerCase().startsWith("/reaction")) {
-			reactionHandler(message);
+			sendMessage("This command is disabled for now");
+			/*reactionHandlerUserRequest(message);*/
 		}
 	}
 });
