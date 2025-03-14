@@ -1,11 +1,12 @@
 import {Client, GatewayIntentBits} from "discord.js";
 import dotenv from "dotenv";
 import {spinDice} from "./commands/spinDices";
-import {sendMessage, setCurrentClient, setCurrentMessage} from "./commands/sendMessage";
+import {sendMessage, setCurrentMessage} from "./commands/sendMessage";
 import {welcomeGenerator} from "./commands/welcomeGenerator";
-import {reactionHandler, reactionHandlerUserRequest} from "./commands/reactionHandler";
 import {onStartup} from "./commands/onStartup";
 import {tickets} from "./commands/tickets";
+import cron from "node-cron";
+import {sayHello} from "./commands/sayHello";
 
 dotenv.config();
 
@@ -17,11 +18,17 @@ const client = new Client({
 		GatewayIntentBits.GuildMembers
 	]
 });
-	export default client;
+export default client;
 
 client.on("ready", () => {
 	onStartup();
 	console.log(`Bot connecté en tant que ${client.user?.tag}`);
+
+	cron.schedule("0 7 * * *", () => {
+		sayHello();
+	}, {
+		timezone: "Europe/Paris"
+	});
 });
 
 client.on("messageCreate", async (message) => {
@@ -42,6 +49,9 @@ client.on("messageCreate", async (message) => {
 			sendMessage("This command is disabled for now");
 			/*reactionHandlerUserRequest(message);*/
 		}
+		if (message.content.toLowerCase().startsWith("/bonjour")) {
+			sayHello()
+		}
 	}
 });
 
@@ -51,7 +61,7 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 	const addedRoles = newRoles.filter(role => !oldRoles.has(role.id));
 	const removedRoles = oldRoles.filter(role => !newRoles.has(role.id));
 
-	if(process.env.ROLE_POPULACE && addedRoles.has(process.env.ROLE_POPULACE)) {
+	if (process.env.ROLE_POPULACE && addedRoles.has(process.env.ROLE_POPULACE)) {
 		welcomeGenerator(newMember.user);
 	}
 });
@@ -61,3 +71,9 @@ client.on("guildMemberRemove", (member) => {
 });
 
 client.login(process.env.TOKEN);
+
+// Define the daily task function
+function dailyTask() {
+	console.log("Executing daily task at 8 AM UTC+1");
+	// Add your task logic here
+}
