@@ -70,6 +70,10 @@ client.on("guildMemberRemove", (member) => {
 	sendMessage(`Au revoir, <@${member.id}> !`);
 });
 
+client.on("guildMemberAdd", (member) => {
+	welcomeGenerator(member.user);
+});
+
 client.login(process.env.TOKEN);
 
 // Define the daily task function
