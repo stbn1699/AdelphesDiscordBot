@@ -33,7 +33,7 @@ export async function ticketsCreate(author: User) {
 		channel.send(`Bonjour <@${author.id}>, bienvenue dans votre ticket !, <@&${process.env.ROLE_MODERATOR}>`);
 
 		// Read the existing tickets data
-		const ticketsDataPath = path.join(__dirname, '../datas/ticketsData.json');
+		const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
 		let ticketsData = [];
 		if (!fs.existsSync(ticketsDataPath)) {
 			fs.writeFileSync(ticketsDataPath, JSON.stringify([]));
@@ -74,12 +74,12 @@ export async function ticketsClose(channelName: string) {
 			content: msg.content,
 			date: msg.createdAt.toISOString()
 		}));
-		const archivePath = path.join(__dirname, `../../archives/${channelName}.json`);
+		const archivePath = path.join(__dirname, `${process.env.DATA_LOCATION}/archives/${channelName}.json`);
 		const archiveDir = path.dirname(archivePath);
 		fs.mkdirSync(archiveDir, {recursive: true});
 		fs.writeFileSync(archivePath, JSON.stringify(archive, null, 2));
 
-		const ticketsDataPath = path.join(__dirname, '../datas/ticketsData.json');
+		const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
 		let ticketsData = [];
 		if (fs.existsSync(ticketsDataPath)) {
 			const data = fs.readFileSync(ticketsDataPath, 'utf-8');
@@ -97,7 +97,7 @@ export async function ticketsClose(channelName: string) {
 
 export async function getTicketArchive(message: Message) {
 	const ticketNumber = parseInt(message.content.split(' ')[1]);
-	const archivePath = path.join(__dirname, `../../archives/ticket-${ticketNumber}.json`);
+	const archivePath = path.join(__dirname, `${process.env.DATA_LOCATION}/archives/ticket-${ticketNumber}.json`);
 	let archive: TicketArchive[] | null = null;
 	if (fs.existsSync(archivePath)) {
 		archive = JSON.parse(fs.readFileSync(archivePath, 'utf-8'));

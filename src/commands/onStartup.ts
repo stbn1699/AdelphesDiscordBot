@@ -5,7 +5,7 @@ import {TicketSave} from "../models/TicketSave";
 import {generalValues} from "./generalValues";
 
 export function onStartup(): void {
-	const ticketsDataPath = "./src/datas/ticketsData.json";
+	const ticketsDataPath = `${process.env.DATA_LOCATION}/ticketsData.json`;
 
 	// Check if the file exists, if not create it with an empty array
 	if (!fs.existsSync(ticketsDataPath)) {
