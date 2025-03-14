@@ -60,10 +60,6 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 	const newRoles = newMember.roles.cache;
 	const addedRoles = newRoles.filter(role => !oldRoles.has(role.id));
 	const removedRoles = oldRoles.filter(role => !newRoles.has(role.id));
-
-	if (process.env.ROLE_POPULACE && addedRoles.has(process.env.ROLE_POPULACE)) {
-		welcomeGenerator(newMember.user);
-	}
 });
 
 client.on("guildMemberRemove", (member) => {
