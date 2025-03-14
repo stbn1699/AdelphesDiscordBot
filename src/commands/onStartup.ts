@@ -12,7 +12,7 @@ export function onStartup(): void {
 		fs.writeFileSync(ticketsDataPath, JSON.stringify([]));
 	}
 
-	const ticketData: TicketSave[] = JSON.parse(fs.readFileSync("src/datas/ticketsData.json", "utf8"));
+	const ticketData: TicketSave[] = JSON.parse(fs.readFileSync("../datas/ticketsData.json", "utf8"));
 	let highestTicketNumber: number = 0;
 
 	ticketData.forEach((ticket) => {
