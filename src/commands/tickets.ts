@@ -35,7 +35,9 @@ export async function ticketsCreate(author: User) {
 		// Read the existing tickets data
 		const ticketsDataPath = path.join(__dirname, '../datas/ticketsData.json');
 		let ticketsData = [];
-		if (fs.existsSync(ticketsDataPath)) {
+		if (!fs.existsSync(ticketsDataPath)) {
+			fs.writeFileSync(ticketsDataPath, JSON.stringify([]));
+		} else {
 			const data = fs.readFileSync(ticketsDataPath, 'utf-8');
 			ticketsData = JSON.parse(data);
 		}
@@ -74,7 +76,7 @@ export async function ticketsClose(channelName: string) {
 		}));
 		const archivePath = path.join(__dirname, `../../archives/${channelName}.json`);
 		const archiveDir = path.dirname(archivePath);
-		fs.mkdirSync(archiveDir, { recursive: true });
+		fs.mkdirSync(archiveDir, {recursive: true});
 		fs.writeFileSync(archivePath, JSON.stringify(archive, null, 2));
 
 		const ticketsDataPath = path.join(__dirname, '../datas/ticketsData.json');
