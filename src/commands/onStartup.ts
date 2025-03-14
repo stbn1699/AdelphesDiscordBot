@@ -5,14 +5,14 @@ import {TicketSave} from "../models/TicketSave";
 import {generalValues} from "./generalValues";
 
 export function onStartup(): void {
-	const ticketsDataPath = "src/datas/ticketsData.json";
+	const ticketsDataPath = "./src/datas/ticketsData.json";
 
 	// Check if the file exists, if not create it with an empty array
 	if (!fs.existsSync(ticketsDataPath)) {
 		fs.writeFileSync(ticketsDataPath, JSON.stringify([]));
 	}
 
-	const ticketData: TicketSave[] = JSON.parse(fs.readFileSync("../datas/ticketsData.json", "utf8"));
+	const ticketData: TicketSave[] = JSON.parse(fs.readFileSync(ticketsDataPath, "utf8"));
 	let highestTicketNumber: number = 0;
 
 	ticketData.forEach((ticket) => {
