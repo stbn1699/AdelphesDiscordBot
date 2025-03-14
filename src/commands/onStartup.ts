@@ -2,6 +2,7 @@ import * as fs from "node:fs";
 import {ReactionRolesData} from "../models/ReactionRolesData";
 import {reactionHandler} from "./reactionHandler";
 import {TicketSave} from "../models/TicketSave";
+import {generalValues} from "./generalValues";
 
 export function onStartup(): void {
 
@@ -13,9 +14,7 @@ export function onStartup(): void {
 			highestTicketNumber = ticket.ticketNumber;
 		}
 	});
-	const generalValues = JSON.parse(fs.readFileSync("src/datas/generalValues.json", "utf8"));
-	generalValues.lastTicketNumber = highestTicketNumber;
-	fs.writeFileSync("src/datas/generalValues.json", JSON.stringify(generalValues, null, 2), "utf8");
+	generalValues().setLastTicketNumber(highestTicketNumber);
 
 	/*let reactionRolesData: ReactionRolesData[] = [];
 

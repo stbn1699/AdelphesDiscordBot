@@ -1,10 +1,10 @@
-import {Client, GatewayIntentBits} from "discord.js";
+import {Client, GatewayIntentBits, ChannelType, TextChannel} from "discord.js";
 import dotenv from "dotenv";
 import {spinDice} from "./commands/spinDices";
 import {sendMessage, setCurrentMessage} from "./commands/sendMessage";
 import {welcomeGenerator} from "./commands/welcomeGenerator";
 import {onStartup} from "./commands/onStartup";
-import {tickets} from "./commands/tickets";
+import {ticketsCreate, ticketsClose, getTicketArchive} from "./commands/tickets";
 import cron from "node-cron";
 import {sayHello} from "./commands/sayHello";
 
@@ -41,7 +41,12 @@ client.on("messageCreate", async (message) => {
 		spinDice(message.content);
 	}
 	if (message.content.toLowerCase() === "/new") {
-		tickets(message.author);
+		ticketsCreate(message.author);
+	}
+	if (message.content.toLowerCase() === "/close") {
+		if (message.channel.type === ChannelType.GuildText) {
+			ticketsClose((message.channel as TextChannel).name);
+		}
 	}
 	// Check if the user has the moderator role
 	if (process.env.ROLE_MODERATOR && message.member?.roles.cache.has(process.env.ROLE_MODERATOR)) {
@@ -52,10 +57,15 @@ client.on("messageCreate", async (message) => {
 		if (message.content.toLowerCase().startsWith("/bonjour")) {
 			sayHello()
 		}
+		if (message.content.toLowerCase().startsWith("/getticket")) {
+			getTicketArchive(message);
+		}
 	}
 });
 
-client.on("guildMemberUpdate", (oldMember, newMember) => {
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+	if (oldMember.partial) await oldMember.fetch();
+	if (newMember.partial) await newMember.fetch();
 	const oldRoles = oldMember.roles.cache;
 	const newRoles = newMember.roles.cache;
 	const addedRoles = newRoles.filter(role => !oldRoles.has(role.id));

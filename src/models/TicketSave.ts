@@ -5,11 +5,4 @@ export interface TicketSave {
 	closed: boolean;
 	closedDate: string | null;
 	closedBy: string | null;
-	messages: TicketMessage[];
-}
-
-interface TicketMessage {
-	user: string;
-	content: string;
-	date: string;
 }
