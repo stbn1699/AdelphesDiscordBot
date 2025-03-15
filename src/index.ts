@@ -7,6 +7,7 @@ import {onStartup} from "./commands/onStartup";
 import {getTicketArchive, ticketsClose, ticketsCreate} from "./commands/tickets";
 import {sayHello} from "./commands/sayHello";
 import cron from "node-cron";
+import {titleFinder} from "./commands/titleFinder";
 
 dotenv.config();
 
@@ -65,6 +66,11 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 		await getTicketArchive(interaction.options.getInteger("ticketnumber")!);
 		console.log(`Archive du ticket ${interaction.options.getInteger("ticketnumber")!} demandée`);
 	}
+});
+
+client.on("messageCreate", async (message) => {
+	if (message.author.bot) return;
+	titleFinder(message);
 });
 
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
