@@ -3,9 +3,16 @@ import {ReactionRolesData} from "../models/ReactionRolesData";
 import {reactionHandler} from "./reactionHandler";
 import {TicketSave} from "../models/TicketSave";
 import {generalValues} from "./generalValues";
+import path from "node:path";
 
 export function onStartup(): void {
-	const ticketsDataPath = `${process.env.DATA_LOCATION}/ticketsData.json`;
+	const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
+	const ticketsDataDir = path.dirname(ticketsDataPath);
+
+	// Ensure the directory exists
+	if (!fs.existsSync(ticketsDataDir)) {
+		fs.mkdirSync(ticketsDataDir, { recursive: true });
+	}
 
 	// Check if the file exists, if not create it with an empty array
 	if (!fs.existsSync(ticketsDataPath)) {

@@ -1,5 +1,5 @@
 .env
-src/datas/*.json
+/data/*.json
 /dist
 /node_modules
 /.idea
