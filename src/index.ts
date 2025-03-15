@@ -44,7 +44,7 @@ client.on("messageCreate", async (message) => {
 		ticketsCreate(message.author);
 	}
 	if (message.content.toLowerCase() === "/close") {
-		if (message.channel.type === ChannelType.GuildText) {
+		if (message.channel.type === ChannelType.GuildText && message.channel.name.startsWith("ticket-")) {
 			ticketsClose((message.channel as TextChannel).name);
 		}
 	}
