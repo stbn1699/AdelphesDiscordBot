@@ -62,6 +62,8 @@ export async function ticketsCreate(author: User) {
 	});
 
 	generalValues().setLastTicketNumber(ticketNumber);
+
+	return ticketNumber;
 }
 
 export async function ticketsClose(channelName: string) {
@@ -95,8 +97,7 @@ export async function ticketsClose(channelName: string) {
 	}
 }
 
-export async function getTicketArchive(message: Message) {
-	const ticketNumber = parseInt(message.content.split(' ')[1]);
+export async function getTicketArchive(ticketNumber: number) {
 	const archivePath = path.join(__dirname, `${process.env.DATA_LOCATION}/archives/ticket-${ticketNumber}.json`);
 	let archive: TicketArchive[] | null = null;
 	if (fs.existsSync(archivePath)) {

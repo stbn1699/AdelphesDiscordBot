@@ -1,9 +1,12 @@
 import {sendMessage} from "./sendMessage";
+import {getCurrentInteraction} from "../index";
+import {Interaction} from "discord.js";
 
-export function spinDice(rawDicesParams: string): void {
+export function spinDice(rawDicesParams: string): string {
 	let message: string = "# Lancé de dés";
 	let allvalues: number[] = [];
-	const userDices: string[] = rawDicesParams.toLowerCase().slice(6).split(" ");
+	const userDices: string[] = rawDicesParams.toLowerCase().split(" ");
+	const interaction: Interaction | null = getCurrentInteraction();
 
 	let diceNumber: number = 0;
 	let numberOfDices: number = 0;
@@ -45,5 +48,5 @@ export function spinDice(rawDicesParams: string): void {
 	}
 	const total = allvalues.reduce((a, b) => a + b, 0);
 	message = `${message} \n\n\nTotal = ${total}`;
-	sendMessage(message)
+	return message
 }

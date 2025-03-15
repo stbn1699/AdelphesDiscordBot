@@ -1,12 +1,12 @@
-import {Client, GatewayIntentBits, ChannelType, TextChannel} from "discord.js";
+import {ChannelType, Client, GatewayIntentBits, Interaction} from "discord.js";
 import dotenv from "dotenv";
 import {spinDice} from "./commands/spinDices";
-import {sendMessage, setCurrentMessage} from "./commands/sendMessage";
+import {sendMessage} from "./commands/sendMessage";
 import {welcomeGenerator} from "./commands/welcomeGenerator";
 import {onStartup} from "./commands/onStartup";
-import {ticketsCreate, ticketsClose, getTicketArchive} from "./commands/tickets";
-import cron from "node-cron";
+import {getTicketArchive, ticketsClose, ticketsCreate} from "./commands/tickets";
 import {sayHello} from "./commands/sayHello";
+import cron from "node-cron";
 
 dotenv.config();
 
@@ -23,43 +23,47 @@ export default client;
 client.on("ready", () => {
 	onStartup();
 	console.log(`Bot connecté en tant que ${client.user?.tag}`);
-
-	cron.schedule("0 7 * * *", () => {
-		sayHello();
-	}, {
-		timezone: "Europe/Paris"
-	});
 });
 
-client.on("messageCreate", async (message) => {
-	if (message.author.bot) return;
-	setCurrentMessage(message);
-	if (message.content.toLowerCase() === "ping") {
-		sendMessage("Pong! :ping_pong:");
-	}
-	if (message.content.toLowerCase().startsWith("/dice")) {
-		spinDice(message.content);
-	}
-	if (message.content.toLowerCase() === "/new") {
-		ticketsCreate(message.author);
-	}
-	if (message.content.toLowerCase() === "/close") {
-		if (message.channel.type === ChannelType.GuildText && message.channel.name.startsWith("ticket-")) {
-			ticketsClose((message.channel as TextChannel).name);
+cron.schedule("0 8 * * *", async () => {
+	await sayHello();
+});
+
+let currentInteraction: Interaction | null = null;
+export function setCurrentInteraction(interaction: Interaction): void {
+	currentInteraction = interaction;
+}
+
+export function getCurrentInteraction(): Interaction | null {
+	return currentInteraction;
+}
+
+client.on("interactionCreate", async (interaction: Interaction) => {
+	if (!interaction.isChatInputCommand()) return;
+
+	const { commandName } = interaction;
+	setCurrentInteraction(interaction);
+
+	if (commandName === "ping") {
+		await interaction.reply("🏓 Pong!");
+	} else if (commandName === "dice") {
+		interaction.reply(spinDice(interaction.options.getString("rolls")!));
+	} else if (commandName === "new") {
+		const ticketNumber: number = await ticketsCreate(interaction.user);
+		console.log(`Ticket ${ticketNumber} créé`);
+		await interaction.reply(`📩 Ticket créé ! vous avez le numéro ${ticketNumber} 📩`);
+	} else if (commandName === "close") {
+		if (interaction.channel?.type === ChannelType.GuildText && interaction.channel.name.startsWith("ticket-")) {
+			await ticketsClose(interaction.channel.name);
+			console.log(`Ticket ${interaction.channel.name.slice(7)} supprimé`);
+		} else {
+			await interaction.reply("❌ Vous ne pouvez pas fermer ce canal !");
 		}
-	}
-	// Check if the user has the moderator role
-	if (process.env.ROLE_MODERATOR && message.member?.roles.cache.has(process.env.ROLE_MODERATOR)) {
-		if (message.content.toLowerCase().startsWith("/reaction")) {
-			sendMessage("This command is disabled for now");
-			/*reactionHandlerUserRequest(message);*/
-		}
-		if (message.content.toLowerCase().startsWith("/bonjour")) {
-			sayHello()
-		}
-		if (message.content.toLowerCase().startsWith("/getticket")) {
-			getTicketArchive(message);
-		}
+	} else if (commandName === "bonjour") {
+		await sayHello();
+	} else if (commandName === "getticket" && interaction.user) {
+		await getTicketArchive(interaction.options.getInteger("ticketnumber")!);
+		console.log(`Archive du ticket ${interaction.options.getInteger("ticketnumber")!} demandée`);
 	}
 });
 

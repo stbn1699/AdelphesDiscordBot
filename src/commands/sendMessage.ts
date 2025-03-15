@@ -2,25 +2,15 @@ import {AttachmentBuilder, Client, Message, TextChannel} from "discord.js";
 import {writeFileSync} from "fs";
 import {tmpdir} from "os";
 import {join} from "path";
-
-let currentMessage: Message;
-let currentClient: Client;
-
-export function setCurrentClient(newClient: Client): void {
-	currentClient = newClient;
-}
-
-export function setCurrentMessage(message: Message): void {
-	currentMessage = message;
-}
+import client, {getCurrentInteraction} from "../index";
 
 export async function sendMessage(text: string, channelId?: string): Promise<void> {
 	let channel: TextChannel | null = null;
 
 	if (channelId) {
-		channel = await currentClient.channels.fetch(channelId) as TextChannel;
-	} else if (currentMessage) {
-		channel = currentMessage.channel as TextChannel;
+		channel = await client.channels.fetch(channelId) as TextChannel;
+	} else if (getCurrentInteraction()) {
+		channel = getCurrentInteraction()?.channel as TextChannel;
 	}
 
 	if (!channel) {
