@@ -15,10 +15,12 @@ export function setCurrentMessage(message: Message): void {
 }
 
 export async function sendMessage(text: string, channelId?: string): Promise<void> {
-	let channel = currentMessage?.channel;
+	let channel: TextChannel | null = null;
 
-	if (!channel && channelId) {
+	if (channelId) {
 		channel = await currentClient.channels.fetch(channelId) as TextChannel;
+	} else if (currentMessage) {
+		channel = currentMessage.channel as TextChannel;
 	}
 
 	if (!channel) {

@@ -81,9 +81,3 @@ client.on("guildMemberAdd", (member) => {
 });
 
 client.login(process.env.TOKEN);
-
-// Define the daily task function
-function dailyTask() {
-	console.log("Executing daily task at 8 AM UTC+1");
-	// Add your task logic here
-}
