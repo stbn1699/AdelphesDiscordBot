@@ -99,17 +99,16 @@ export async function ticketsClose(channelName: string) {
 	}
 }
 
-export async function getTicketArchive(ticketNumber: number) {
+export function getTicketArchive(ticketNumber: number): string {
 	const archivePath = path.join(__dirname, `${process.env.DATA_LOCATION}/archives/ticket-${ticketNumber}.json`);
 	let archive: TicketArchive[] | null = null;
 	if (fs.existsSync(archivePath)) {
 		archive = JSON.parse(fs.readFileSync(archivePath, 'utf-8'));
 	}
 	if (archive != null) {
-		sendMessage(`Voici l'archive du ticket #${ticketNumber}\n\`\`\`${archive.reverse().map(msg => `Auteur: ${msg.author}\nContenu: ${msg.content}`).join('\n\n')}\`\`\``);
-		return
+		return `Voici l'archive du ticket #${ticketNumber}\n\`\`\`${archive.reverse().map(msg => `Auteur: ${msg.author}\nContenu: ${msg.content}`).join('\n\n')}\`\`\``;
 	}
-	sendMessage(`L'archive du ticket #${ticketNumber} n'existe pas`);
+	return `L'archive du ticket #${ticketNumber} n'existe pas`;
 }
 
 export function listTickets(): string {

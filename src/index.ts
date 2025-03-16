@@ -58,13 +58,13 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 		await interaction.reply(`📩 Ticket créé ! vous avez le numéro ${ticketNumber} 📩`);
 	} else if (commandName === "close") {
 		if (interaction.channel?.type === ChannelType.GuildText && interaction.channel.name.startsWith("ticket-")) {
-			await ticketsClose(interaction.channel.name);
+			ticketsClose(interaction.channel.name);
 			console.log(`Ticket ${interaction.channel.name.slice(7)} supprimé`);
 		} else {
-			await interaction.reply("❌ Vous ne pouvez pas fermer ce canal !");
+			interaction.reply("❌ Vous ne pouvez pas fermer ce canal !");
 		}
 	} else if (commandName === "getticket" && interaction.user) {
-		await getTicketArchive(interaction.options.getInteger("ticketnumber")!);
+		interaction.reply(getTicketArchive(interaction.options.getInteger("ticketnumber")!));
 		console.log(`Archive du ticket ${interaction.options.getInteger("ticketnumber")!} demandée`);
 	} else if (commandName === "listtickets") {
 		interaction.reply(listTickets()!);
