@@ -4,7 +4,7 @@ import {spinDice} from "./commands/spinDices";
 import {sendMessage} from "./commands/sendMessage";
 import {welcomeGenerator} from "./commands/welcomeGenerator";
 import {onStartup} from "./commands/onStartup";
-import {getTicketArchive, ticketsClose, ticketsCreate} from "./commands/tickets";
+import {getTicketArchive, listTickets, ticketsClose, ticketsCreate} from "./commands/tickets";
 import {sayHello} from "./commands/sayHello";
 import cron from "node-cron";
 import {titleFinder} from "./commands/titleFinder";
@@ -31,6 +31,7 @@ cron.schedule("0 8 * * *", async () => {
 });
 
 let currentInteraction: Interaction | null = null;
+
 export function setCurrentInteraction(interaction: Interaction): void {
 	currentInteraction = interaction;
 }
@@ -42,15 +43,17 @@ export function getCurrentInteraction(): Interaction | null {
 client.on("interactionCreate", async (interaction: Interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 
-	const { commandName } = interaction;
+	const {commandName} = interaction;
 	setCurrentInteraction(interaction);
 
 	if (commandName === "ping") {
 		await interaction.reply("🏓 Pong!");
+	} else if (commandName === "bonjour") {
+		await sayHello();
 	} else if (commandName === "dice") {
 		interaction.reply(spinDice(interaction.options.getString("rolls")!));
 	} else if (commandName === "new") {
-		const ticketNumber: number = await ticketsCreate(interaction.user);
+		const ticketNumber: number = await ticketsCreate(interaction.options.getString("titre")!, interaction.user);
 		console.log(`Ticket ${ticketNumber} créé`);
 		await interaction.reply(`📩 Ticket créé ! vous avez le numéro ${ticketNumber} 📩`);
 	} else if (commandName === "close") {
@@ -60,18 +63,19 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 		} else {
 			await interaction.reply("❌ Vous ne pouvez pas fermer ce canal !");
 		}
-	} else if (commandName === "bonjour") {
-		await sayHello();
 	} else if (commandName === "getticket" && interaction.user) {
 		await getTicketArchive(interaction.options.getInteger("ticketnumber")!);
 		console.log(`Archive du ticket ${interaction.options.getInteger("ticketnumber")!} demandée`);
+	} else if (commandName === "listtickets") {
+		interaction.reply(listTickets()!);
+		console.log("Liste des tickets demandée");
 	}
 });
 
-client.on("messageCreate", async (message) => {
+/*client.on("messageCreate", async (message) => {
 	if (message.author.bot) return;
 	titleFinder(message);
-});
+});*/
 
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
 	if (oldMember.partial) await oldMember.fetch();

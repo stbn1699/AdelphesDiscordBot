@@ -10,32 +10,40 @@ const commands = [
 		.setDescription("Répond avec Pong! 🏓"),
 
 	new SlashCommandBuilder()
+		.setName("bonjour")
+		.setDescription("Dit bonjour"),
+
+	new SlashCommandBuilder()
 		.setName("dice")
 		.setDescription("Lance un dé aléatoire")
-		.addStringOption(option =>
-			option.setName("rolls")
-				.setDescription("Lancez plusieurs dés au format 'NdF' (ex: '3d6 5d20') où N=nombre de dés et F=nombre de faces.")
-				.setRequired(true)),
+		.addStringOption(option => option
+			.setName("rolls")
+			.setDescription("Lancez plusieurs dés au format 'NdF' (ex: '3d6 5d20') où N=nombre de dés et F=nombre de faces.")
+			.setRequired(true)),
 
 	new SlashCommandBuilder()
 		.setName("new")
-		.setDescription("Créer un nouveau ticket"),
+		.setDescription("Créer un nouveau ticket")
+		.addStringOption(option => option
+			.setName("titre")
+			.setDescription("Le titre du ticket")
+			.setRequired(true)),
 
 	new SlashCommandBuilder()
 		.setName("close")
 		.setDescription("Fermer le ticket en cours"),
 
 	new SlashCommandBuilder()
-		.setName("bonjour")
-		.setDescription("Dit bonjour"),
-
-	new SlashCommandBuilder()
 		.setName("getticket")
 		.setDescription("Récupérer un ticket archivé")
-		.addIntegerOption(option =>
-			option.setName("ticketnumber")
-				.setDescription("Le numéro du ticket à récupérer")
-				.setRequired(true))
+		.addIntegerOption(option => option
+			.setName("ticketnumber")
+			.setDescription("Le numéro du ticket à récupérer")
+			.setRequired(true)),
+
+	new SlashCommandBuilder()
+		.setName("listtickets")
+		.setDescription("Liste les tickets, archivés ou non")
 ].map(command => command.toJSON());
 
 // Initialisation de REST

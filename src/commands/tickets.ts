@@ -1,4 +1,4 @@
-import {User, PermissionFlagsBits, TextChannel, Message} from "discord.js";
+import {Interaction, PermissionFlagsBits, TextChannel, User} from "discord.js";
 import {generalValues} from "./generalValues";
 import client from "../index";
 import path from "node:path";
@@ -6,11 +6,12 @@ import fs from "node:fs";
 import {sendMessage} from "./sendMessage";
 import {TicketArchive} from "../models/ticketArchive";
 
-export async function ticketsCreate(author: User) {
+export async function ticketsCreate(titre: string, user: User) {
 
 	const ticketNumber = generalValues().getLastTicketNumber() + 1;
 	const guild = client.guilds.cache.get(process.env.GUILD_ID!);
 	const channelName = `ticket-${ticketNumber}`;
+	const title = titre;
 
 	guild?.channels.create({
 		name: channelName,
@@ -21,7 +22,7 @@ export async function ticketsCreate(author: User) {
 				deny: [PermissionFlagsBits.ViewChannel],
 			},
 			{
-				id: author.id,
+				id: user,
 				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages],
 			},
 			{
@@ -30,7 +31,7 @@ export async function ticketsCreate(author: User) {
 			},
 		],
 	}).then((channel) => {
-		channel.send(`Bonjour <@${author.id}>, bienvenue dans votre ticket !, <@&${process.env.ROLE_MODERATOR}>`);
+		channel.send(`Bonjour <@${user}>, bienvenue dans votre ticket ! Un.e <@&${process.env.ROLE_MODERATOR}> devrai rapidement te répondre`);
 
 		// Read the existing tickets data
 		const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
@@ -44,7 +45,8 @@ export async function ticketsCreate(author: User) {
 
 		// Create the new ticket object
 		const newTicket = {
-			createdBy: author.tag,
+			createdBy: user.tag,
+			title: title,
 			ticketNumber: ticketNumber,
 			creationDate: new Date().toISOString(),
 			closed: false,
@@ -108,4 +110,15 @@ export async function getTicketArchive(ticketNumber: number) {
 		return
 	}
 	sendMessage(`L'archive du ticket #${ticketNumber} n'existe pas`);
+}
+
+export function listTickets(): string {
+	const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
+	let ticketsData = [];
+	if (fs.existsSync(ticketsDataPath)) {
+		const data = fs.readFileSync(ticketsDataPath, 'utf-8');
+		ticketsData = JSON.parse(data);
+	}
+	const tickets: string[] = ticketsData.map((ticket: any) => `${ticket.title} - ${ticket.closed ? 'Fermé' : 'Ouvert'} - Créé par ${ticket.createdBy} - n°${ticket.ticketNumber}`);
+	return `Liste des tickets\n\`\`\`${tickets.join('\n')}\`\`\``;
 }
