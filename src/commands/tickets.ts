@@ -31,7 +31,7 @@ export async function ticketsCreate(titre: string, user: User) {
 			},
 		],
 	}).then((channel) => {
-		channel.send(`Bonjour <@${user}>, bienvenue dans votre ticket ! Un.e <@&${process.env.ROLE_MODERATOR}> devrai rapidement te répondre`);
+		channel.send(`Bonjour <@${user}>, bienvenue dans votre ticket ! Un.e <@&${process.env.ROLE_MODERATOR}> devrait rapidement te répondre`);
 
 		// Read the existing tickets data
 		const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
