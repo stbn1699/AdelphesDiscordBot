@@ -1,8 +1,7 @@
 import {TextChannel} from "discord.js";
 import client from "../index";
 
-export async function sayHello() {
-	const messagesHello: string[] = [
+export const messagesHello: string[] = [
 		"Salut tout le monde ! :smiley: Passez une super journée !",
 		"Bonjour à toustes ! :sun_with_face: Comment ça va aujourd’hui ?",
 		"Hey hey hey ! :grinning: J’espère que vous allez bien !",
@@ -153,9 +152,10 @@ export async function sayHello() {
 		"Hello ! Un petit coucou pour bien commencer la journée. :sun_with_face:",
 		"Salut la team ! J’espère que tout se passe bien pour vous. :coffee:",
 		"Bonjour tout le monde ! Une nouvelle journée commence. :sunrise:"
-	];
+        ];
 
-	const randomIndex = Math.floor(Math.random() * messagesHello.length);
-	const channel = await client.channels.fetch(`${process.env.GENERAL_CHANNEL}`) as TextChannel;
-	await channel.send(messagesHello[randomIndex]);
+export async function sayHello(): Promise<void> {
+        const randomIndex = Math.floor(Math.random() * messagesHello.length);
+        const channel = await client.channels.fetch(`${process.env.GENERAL_CHANNEL}`) as TextChannel;
+        await channel.send(messagesHello[randomIndex]);
 }
