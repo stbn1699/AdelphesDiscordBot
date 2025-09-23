@@ -9,12 +9,16 @@ const commands = [
 		.setName("ping")
 		.setDescription("Répond avec Pong! 🏓"),
 
-	new SlashCommandBuilder()
-		.setName("bonjour")
-		.setDescription("Dit bonjour"),
+        new SlashCommandBuilder()
+                .setName("bonjour")
+                .setDescription("Dit bonjour"),
 
-	new SlashCommandBuilder()
-		.setName("dice")
+        new SlashCommandBuilder()
+                .setName("vdm")
+                .setDescription("Envoie une VDM aléatoire"),
+
+        new SlashCommandBuilder()
+                .setName("dice")
 		.setDescription("Lance un dé aléatoire")
 		.addStringOption(option => option
 			.setName("rolls")

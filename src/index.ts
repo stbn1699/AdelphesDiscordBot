@@ -6,6 +6,7 @@ import {welcomeGenerator} from "./commands/welcomeGenerator";
 import {onStartup} from "./commands/onStartup";
 import {getTicketArchive, listTickets, ticketsClose, ticketsCreate} from "./commands/tickets";
 import {sayHello} from "./commands/sayHello";
+import {getEveningMessageWithVdm, sayGoodEvening} from "./commands/vdm";
 import cron from "node-cron";
 import {titleFinder} from "./commands/titleFinder";
 
@@ -27,7 +28,11 @@ client.on("ready", () => {
 });
 
 cron.schedule("0 8 * * *", async () => {
-	await sayHello();
+        await sayHello();
+});
+
+cron.schedule("0 20 * * *", async () => {
+        await sayGoodEvening();
 });
 
 let currentInteraction: Interaction | null = null;
@@ -50,12 +55,12 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 		await interaction.reply("🏓 Pong!");
 	} else if (commandName === "bonjour") {
 		await sayHello();
-	} else if (commandName === "dice") {
-		interaction.reply(spinDice(interaction.options.getString("rolls")!));
-	} else if (commandName === "new") {
-		const ticketNumber: number = await ticketsCreate(interaction.options.getString("titre")!, interaction.user);
-		console.log(`Ticket ${ticketNumber} créé`);
-		await interaction.reply(`📩 Ticket créé ! vous avez le numéro ${ticketNumber} 📩`);
+        } else if (commandName === "dice") {
+                interaction.reply(spinDice(interaction.options.getString("rolls")!));
+        } else if (commandName === "new") {
+                const ticketNumber: number = await ticketsCreate(interaction.options.getString("titre")!, interaction.user);
+                console.log(`Ticket ${ticketNumber} créé`);
+                await interaction.reply(`📩 Ticket créé ! vous avez le numéro ${ticketNumber} 📩`);
 	} else if (commandName === "close") {
 		if (interaction.channel?.type === ChannelType.GuildText && interaction.channel.name.startsWith("ticket-")) {
 			ticketsClose(interaction.channel.name);
@@ -66,10 +71,18 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 	} else if (commandName === "getticket" && interaction.user) {
 		interaction.reply(getTicketArchive(interaction.options.getInteger("ticketnumber")!));
 		console.log(`Archive du ticket ${interaction.options.getInteger("ticketnumber")!} demandée`);
-	} else if (commandName === "listtickets") {
-		interaction.reply(listTickets()!);
-		console.log("Liste des tickets demandée");
-	}
+        } else if (commandName === "listtickets") {
+                interaction.reply(listTickets()!);
+                console.log("Liste des tickets demandée");
+        } else if (commandName === "vdm") {
+                try {
+                        const message = await getEveningMessageWithVdm();
+                        await interaction.reply(message);
+                } catch (error) {
+                        console.error("Erreur lors de l'envoi d'une VDM :", error);
+                        await interaction.reply("Impossible de récupérer une VDM pour le moment.");
+                }
+        }
 });
 
 /*client.on("messageCreate", async (message) => {
