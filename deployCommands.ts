@@ -1,4 +1,4 @@
-import { REST, Routes, SlashCommandBuilder } from "discord.js";
+import {PermissionFlagsBits, REST, Routes, SlashCommandBuilder} from "discord.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -43,7 +43,20 @@ const commands = [
 
 	new SlashCommandBuilder()
 		.setName("listtickets")
-		.setDescription("Liste les tickets, archivés ou non")
+		.setDescription("Liste les tickets, archivés ou non"),
+
+	new SlashCommandBuilder()
+		.setName("sendmessage")
+		.setDescription("Envoyer un message dans un salon spécifique (admin uniquement)")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addChannelOption(option => option
+			.setName("salon")
+			.setDescription("Le salon où envoyer le message")
+			.setRequired(true))
+		.addStringOption(option => option
+			.setName("message")
+			.setDescription("Le message à envoyer")
+			.setRequired(true))
 ].map(command => command.toJSON());
 
 // Initialisation de REST

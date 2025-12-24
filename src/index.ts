@@ -1,4 +1,4 @@
-import {ChannelType, Client, GatewayIntentBits, Interaction} from "discord.js";
+import {ChannelType, Client, GatewayIntentBits, Interaction, PermissionFlagsBits, TextBasedChannel} from "discord.js";
 import dotenv from "dotenv";
 import {spinDice} from "./commands/spinDices";
 import {sendMessage} from "./commands/sendMessage";
@@ -69,7 +69,23 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 	} else if (commandName === "listtickets") {
 		interaction.reply(listTickets()!);
 		console.log("Liste des tickets demandée");
-	}
+    } else if (commandName === "sendmessage") {
+        if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+            await interaction.reply({content: "❌ Seuls les administrateurs peuvent utiliser cette commande.", ephemeral: true});
+            return;
+        }
+
+        const targetChannel = interaction.options.getChannel("salon", true) as TextBasedChannel;
+        const message = interaction.options.getString("message", true);
+
+        if (!targetChannel.isTextBased()) {
+            await interaction.reply({content: "❌ Le salon choisi n'accepte pas les messages.", ephemeral: true});
+            return;
+        }
+
+        await sendMessage(message, targetChannel.id);
+        await interaction.reply({content: `✅ Message envoyé dans ${targetChannel}.`, ephemeral: true});
+    }
 });
 
 /*client.on("messageCreate", async (message) => {
