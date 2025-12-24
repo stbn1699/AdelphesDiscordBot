@@ -2,6 +2,83 @@ import {TextChannel} from "discord.js";
 import client from "../index";
 
 export async function sayHello() {
+	const now = new Date();
+	const month = now.getMonth() + 1;
+	const day = now.getDate();
+	const specialMessages: Record<string, string[]> = {
+		"12-24": [
+			"🎄 Joyeux réveillon de Noël à toustes ! Profitez bien de cette belle soirée ! :sparkles:",
+			"🎅 Bonjour et joyeux réveillon de Noël ! Que la magie opère aujourd’hui ! :christmas_tree:"
+		],
+		"12-25": [
+			"🎁 Joyeux Noël à toustes ! Que cette journée soit remplie de douceur ! :sparkles:",
+			"🎄 Bonjour et joyeux Noël ! Prenez soin de vous et savourez l’instant ! :christmas_tree:"
+		],
+		"12-31": [
+			"🎆 Bonjour et joyeux réveillon du Nouvel An ! Que la fête commence ! :tada:",
+			"🥂 Bon réveillon à toustes ! Profitez bien de cette dernière journée de l’année ! :sparkles:"
+		],
+		"1-1": [
+			"🎉 Bonne année à toustes ! Plein de belles choses pour cette nouvelle année ! :sparkles:",
+			"✨ Bonjour et bon 1er janvier ! Que cette année soit incroyable ! :tada:"
+		],
+		"1-6": [
+			"👑 Bonjour ! Joyeuse Épiphanie à toustes ! :sparkles:",
+			"🥧 Bonne Épiphanie ! Qui a la fève aujourd’hui ? :crown:"
+		],
+		"2-2": [
+			"🕯️ Bonjour ! Joyeuse Chandeleur à toustes ! :sparkles:",
+			"🥞 C’est la Chandeleur ! Bon appétit et belle journée ! :tada:"
+		],
+		"2-14": [
+			"💘 Bonjour ! Joyeuse Saint-Valentin à toustes ! :sparkles:",
+			"❤️ Un bonjour plein d’amour pour la Saint-Valentin ! :heart:"
+		],
+		"3-8": [
+			"💜 Bonjour ! Belle journée internationale des droits des femmes ! :sparkles:",
+			"🌸 Un bonjour spécial pour le 8 mars ! :cherry_blossom:"
+		],
+		"3-17": [
+			"☘️ Bonjour ! Joyeuse Saint-Patrick à toustes ! :sparkles:",
+			"🍀 Un bonjour chanceux pour la Saint-Patrick ! :tada:"
+		],
+		"4-1": [
+			"🤡 Bonjour ! Joyeux 1er avril à toustes ! :sparkles:",
+			"🐟 Un bonjour de poisson d’avril ! :tada:"
+		],
+		"5-1": [
+			"🌿 Bonjour ! Joyeux 1er mai et bonne fête du Travail ! :sparkles:",
+			"🌼 Un bonjour muguet pour le 1er mai ! :tada:"
+		],
+		"5-8": [
+			"🇫🇷 Bonjour ! Bonne commémoration du 8 mai ! :sparkles:",
+			"🕊️ Un bonjour du 8 mai pour une journée de mémoire ! :dove:"
+		],
+		"6-21": [
+			"🎶 Bonjour ! Joyeuse Fête de la Musique à toustes ! :sparkles:",
+			"🎵 Un bonjour en musique pour le 21 juin ! :tada:"
+		],
+		"7-14": [
+			"🇫🇷 Bonjour ! Joyeuse Fête nationale à toustes ! :sparkles:",
+			"🎆 Un bonjour du 14 juillet ! Vive la fête ! :tada:"
+		],
+		"8-15": [
+			"✨ Bonjour ! Bonne Assomption à toustes ! :sparkles:",
+			"🙏 Un bonjour spécial pour l’Assomption ! :dove:"
+		],
+		"11-1": [
+			"🕯️ Bonjour ! Bonne Toussaint à toustes ! :sparkles:",
+			"🌼 Un bonjour pour la Toussaint, prenez soin de vous. :herb:"
+		],
+		"11-11": [
+			"🕊️ Bonjour ! Bonne commémoration du 11 novembre ! :sparkles:",
+			"🌹 Un bonjour du 11 novembre, en mémoire. :dove:"
+		]
+	};
+
+	const specialKey = `${month}-${day}`;
+	const todaysSpecialMessages = specialMessages[specialKey];
+
 	const messagesHello: string[] = [
 		"Salut tout le monde ! :smiley: Passez une super journée !",
 		"Bonjour à toustes ! :sun_with_face: Comment ça va aujourd’hui ?",
@@ -155,7 +232,8 @@ export async function sayHello() {
 		"Bonjour tout le monde ! Une nouvelle journée commence. :sunrise:"
 	];
 
-	const randomIndex = Math.floor(Math.random() * messagesHello.length);
+	const fallbackMessages = todaysSpecialMessages ?? messagesHello;
+	const randomIndex = Math.floor(Math.random() * fallbackMessages.length);
 	const channel = await client.channels.fetch(`${process.env.GENERAL_CHANNEL}`) as TextChannel;
-	await channel.send(messagesHello[randomIndex]);
+	await channel.send(fallbackMessages[randomIndex]);
 }
