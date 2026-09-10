@@ -1,0 +1,10 @@
+services:
+  adelphes-bot:
+    build: .
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
