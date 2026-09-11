@@ -7,7 +7,7 @@ import {onStartup} from "./commands/onStartup";
 import {getTicketArchive, listTickets, ticketsClose, ticketsCreate} from "./commands/tickets";
 import {sayHello} from "./commands/sayHello";
 import cron from "node-cron";
-import {titleFinder} from "./commands/titleFinder";
+import {startMinecraftBridge} from "./minecraftBridge";
 
 dotenv.config();
 
@@ -109,5 +109,7 @@ client.on("guildMemberRemove", (member) => {
 client.on("guildMemberAdd", (member) => {
 	welcomeGenerator(member.user);
 });
+
+startMinecraftBridge(client);
 
 client.login(process.env.TOKEN);
