@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "npx ts-node src/index.ts",
-    "start:prod": "npx tsc && pm2 del adelphes-bot && pm2 start dist/index.js --name adelphes-bot",
-    "deployCommands": "npx ts-node src/deployCommands.ts",
-    "update": "git fetch --all && git reset --hard origin/dev && npm i",
-    "updateDeploy": "npm run update && npm run deployCommands && npm run start:prod"
+	"build": "tsc",
+	"start": "node dist/index.js",
+	"deployCommands": "ts-node src/deployCommands.ts"
   },
   "keywords": [],
   "author": "",

@@ -11,6 +11,6 @@
     "skipLibCheck": true
   },
   "exclude": [
-	  "src/deployCommands.ts"
+	  "deployCommands.ts"
   ]
 }
