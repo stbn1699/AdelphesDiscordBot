@@ -103,7 +103,7 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 });
 
 client.on("guildMemberRemove", (member) => {
-	sendMessage(`Au revoir, <@${member.id}> !`);
+	sendMessage(`Au revoir, <@${member.id}> !`, process.env.WELCOME_CHANNEL);
 });
 
 client.on("guildMemberAdd", (member) => {
