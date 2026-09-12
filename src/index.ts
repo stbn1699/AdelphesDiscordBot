@@ -96,10 +96,10 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
 	if (oldMember.partial) await oldMember.fetch();
 	if (newMember.partial) await newMember.fetch();
-	const oldRoles = oldMember.roles.cache;
+	/*const oldRoles = oldMember.roles.cache;
 	const newRoles = newMember.roles.cache;
 	const addedRoles = newRoles.filter(role => !oldRoles.has(role.id));
-	const removedRoles = oldRoles.filter(role => !newRoles.has(role.id));
+	const removedRoles = oldRoles.filter(role => !newRoles.has(role.id));*/
 });
 
 client.on("guildMemberRemove", (member) => {
