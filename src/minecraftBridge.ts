@@ -49,12 +49,6 @@ export function startMinecraftBridge(client: Client): void {
         limit: "10kb"
     }));
 
-    /**
-     * Minecraft -> Discord
-     *
-     * Le futur plugin appellera :
-     * POST http://127.0.0.1:3001/minecraft/chat
-     */
     app.post("/minecraft/chat", async (
         req: Request<{}, {}, MinecraftChatPayload>,
         res: Response
@@ -91,7 +85,7 @@ export function startMinecraftBridge(client: Client): void {
             }
 
             await channel.send({
-                content: `> \`\<${username}\>\`: ${message}`,
+                content: ` \`\<${username}\>\`: **${message}**`,
                 allowedMentions: {
                     parse: []
                 }
