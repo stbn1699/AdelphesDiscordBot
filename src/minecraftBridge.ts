@@ -25,6 +25,16 @@ type MinecraftChatPayload = {
     message: string;
 };
 
+type MinecraftDeathPayload = {
+    username: string;
+    message: string;
+};
+
+type MinecraftAdvancementPayload = {
+    username: string;
+    advancement: string;
+};
+
 type DiscordChatPayload = {
     username: string;
     userId: string;
@@ -42,6 +52,22 @@ function cleanMessage(value: unknown, maxLength = 1000): string {
         .slice(0, maxLength);
 }
 
+function isAuthorized(req: Request): boolean {
+    return req.header("authorization") === `Bearer ${minecraftBridgeSecret}`;
+}
+
+async function getMinecraftDiscordChannel(client: Client) {
+    const channel = await client.channels.fetch(minecraftDiscordChannelId);
+
+    if (!channel || !channel.isSendable()) {
+        throw new Error(
+            "Le salon Discord Minecraft est introuvable ou ne permet pas d'envoyer des messages"
+        );
+    }
+
+    return channel;
+}
+
 export function startMinecraftBridge(client: Client): void {
     const app = express();
 
@@ -49,23 +75,21 @@ export function startMinecraftBridge(client: Client): void {
         limit: "10kb"
     }));
 
+    /**
+     * Minecraft -> Discord : chat joueur
+     * Payload : { "username": "Pseudo", "message": "Bonjour" }
+     */
     app.post("/minecraft/chat", async (
         req: Request<{}, {}, MinecraftChatPayload>,
         res: Response
     ) => {
-        console.log("[MinecraftBridge] Requête reçue :", req.body);
-
-        const authorization = req.header("authorization");
-
-        if (authorization !== `Bearer ${minecraftBridgeSecret}`) {
-            res.status(401).json({
-                error: "Unauthorized"
-            });
+        if (!isAuthorized(req)) {
+            res.status(401).json({ error: "Unauthorized" });
             return;
         }
 
         const username = cleanMessage(req.body?.username, 32);
-        const message = cleanMessage(req.body?.message);
+        const message = cleanMessage(req.body?.message, 1000);
 
         if (!username || !message) {
             res.status(400).json({
@@ -75,47 +99,134 @@ export function startMinecraftBridge(client: Client): void {
         }
 
         try {
-            const channel = await client.channels.fetch(minecraftDiscordChannelId);
-
-            if (!channel || !channel.isSendable()) {
-                res.status(500).json({
-                    error: "Le salon Discord Minecraft est introuvable ou ne permet pas d'envoyer des messages"
-                });
-                return;
-            }
+            const channel = await getMinecraftDiscordChannel(client);
 
             await channel.send({
-                content: ` \`\<${username}\>\`: **${message}**`,
+                content: `:speech_balloon: ${username}: ${message}`,
+                allowedMentions: {
+                    parse: []
+                }
+            });
+
+            console.log(`[MinecraftBridge] Chat Minecraft -> Discord : ${username}: ${message}`);
+
+            res.status(200).json({ ok: true });
+        } catch (error) {
+            console.error(
+                "[MinecraftBridge] Erreur pendant l'envoi du chat vers Discord :",
+                error
+            );
+
+            res.status(500).json({
+                error: "Erreur interne lors de l'envoi du chat vers Discord"
+            });
+        }
+    });
+
+    /**
+     * Minecraft -> Discord : mort d'un joueur
+     * Payload : { "username": "Pseudo", "message": "Pseudo tried to swim in lava" }
+     */
+    app.post("/minecraft/death", async (
+        req: Request<{}, {}, MinecraftDeathPayload>,
+        res: Response
+    ) => {
+        if (!isAuthorized(req)) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const username = cleanMessage(req.body?.username, 32);
+        const deathMessage = cleanMessage(req.body?.message, 500);
+
+        if (!username || !deathMessage) {
+            res.status(400).json({
+                error: "username et message sont obligatoires"
+            });
+            return;
+        }
+
+        try {
+            const channel = await getMinecraftDiscordChannel(client);
+
+            await channel.send({
+                content: `:skull: **${username}** est mort : ${deathMessage}`,
                 allowedMentions: {
                     parse: []
                 }
             });
 
             console.log(
-                `[MinecraftBridge] Minecraft -> Discord : ${username}: ${message}`
+                `[MinecraftBridge] Mort Minecraft -> Discord : ${username}: ${deathMessage}`
             );
 
-            res.status(200).json({
-                ok: true
-            });
+            res.status(200).json({ ok: true });
         } catch (error) {
             console.error(
-                "[MinecraftBridge] Erreur pendant l'envoi du message vers Discord :",
+                "[MinecraftBridge] Erreur pendant l'envoi d'une mort vers Discord :",
                 error
             );
 
             res.status(500).json({
-                error: "Erreur interne lors de l'envoi vers Discord"
+                error: "Erreur interne lors de l'envoi de la mort vers Discord"
+            });
+        }
+    });
+
+    /**
+     * Minecraft -> Discord : advancement
+     * Payload : { "username": "Pseudo", "advancement": "Monster Hunter" }
+     */
+    app.post("/minecraft/advancement", async (
+        req: Request<{}, {}, MinecraftAdvancementPayload>,
+        res: Response
+    ) => {
+        if (!isAuthorized(req)) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const username = cleanMessage(req.body?.username, 32);
+        const advancement = cleanMessage(req.body?.advancement, 200);
+
+        if (!username || !advancement) {
+            res.status(400).json({
+                error: "username et advancement sont obligatoires"
+            });
+            return;
+        }
+
+        try {
+            const channel = await getMinecraftDiscordChannel(client);
+
+            await channel.send({
+                content: `:trophy: **${username}** a obtenu l'avancement **${advancement}** !`,
+                allowedMentions: {
+                    parse: []
+                }
+            });
+
+            console.log(
+                `[MinecraftBridge] Advancement Minecraft -> Discord : ${username}: ${advancement}`
+            );
+
+            res.status(200).json({ ok: true });
+        } catch (error) {
+            console.error(
+                "[MinecraftBridge] Erreur pendant l'envoi d'un advancement vers Discord :",
+                error
+            );
+
+            res.status(500).json({
+                error: "Erreur interne lors de l'envoi de l'avancement vers Discord"
             });
         }
     });
 
     /**
      * Discord -> Minecraft
-     *
-     * Uniquement les messages humains dans le salon configuré.
-     * Les messages de bots ou webhooks sont ignorés pour empêcher
-     * une boucle Minecraft -> Discord -> Minecraft.
+     * Seuls les messages humains du salon configuré sont relayés.
+     * Les bots et webhooks sont ignorés pour éviter les boucles.
      */
     client.on("messageCreate", async (message) => {
         if (message.author.bot || message.webhookId) {
@@ -126,9 +237,16 @@ export function startMinecraftBridge(client: Client): void {
             return;
         }
 
-        const content = cleanMessage(message.content);
+        const content = cleanMessage(message.content, 1000);
 
         if (!content) {
+            return;
+        }
+
+        if (!minecraftWebhookUrl) {
+            console.warn(
+                "[MinecraftBridge] MINECRAFT_SERVER_WEBHOOK_URL absent : message Discord non envoyé à Minecraft."
+            );
             return;
         }
 
@@ -141,18 +259,6 @@ export function startMinecraftBridge(client: Client): void {
         console.log(
             `[MinecraftBridge] Discord -> Minecraft : ${payload.username}: ${payload.message}`
         );
-
-        /*
-         * Cette partie échouera normalement tant que ton plugin Minecraft
-         * n'a pas encore créé l'endpoint HTTP POST /discord-message.
-         * Cela n'empêche pas Minecraft -> Discord de fonctionner.
-         */
-        if (!minecraftWebhookUrl) {
-            console.warn(
-                "[MinecraftBridge] MINECRAFT_SERVER_WEBHOOK_URL absent : message non envoyé à Minecraft."
-            );
-            return;
-        }
 
         try {
             const response = await fetch(minecraftWebhookUrl, {
@@ -182,7 +288,10 @@ export function startMinecraftBridge(client: Client): void {
 
     app.listen(port, "0.0.0.0", () => {
         console.log(
-            `[MinecraftBridge] API démarrée sur le port ${port}`
+            `[MinecraftBridge] API démarrée sur http://0.0.0.0:${port}`
         );
+        console.log(`[MinecraftBridge] Chat : POST /minecraft/chat`);
+        console.log(`[MinecraftBridge] Mort : POST /minecraft/death`);
+        console.log(`[MinecraftBridge] Advancement : POST /minecraft/advancement`);
     });
 }
