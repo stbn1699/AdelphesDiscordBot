@@ -21,8 +21,8 @@ const client = new Client({
 });
 export default client;
 
-client.on("ready", () => {
-	onStartup();
+client.on("ready", async () => {
+	await onStartup(client);
 	console.log(`Bot connecté en tant que ${client.user?.tag}`);
 });
 

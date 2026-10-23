@@ -1,12 +1,11 @@
 import * as fs from "node:fs";
-import {ReactionRolesData} from "../models/ReactionRolesData";
-import {reactionHandler} from "./reactionHandler";
 import {TicketSave} from "../models/TicketSave";
 import {generalValues} from "./generalValues";
 import path from "node:path";
 import {dataPath} from "../utils/dataPath";
+import {Client} from "discord.js";
 
-export function onStartup(): void {
+export async function onStartup(client: Client): Promise<void> {
 	const ticketsDataPath = dataPath("ticketsData.json");
 	const ticketsDataDir = path.dirname(ticketsDataPath);
 
@@ -29,6 +28,18 @@ export function onStartup(): void {
 		}
 	});
 	generalValues().setLastTicketNumber(highestTicketNumber);
+
+	const notificationChannelId = process.env.BOT_NOTIFICATION_CHANNEL;
+	if (!notificationChannelId) {
+		throw new Error("BOT_NOTIFICATION_CHANNEL is not configured");
+	}
+
+	const notificationChannel = await client.channels.fetch(notificationChannelId);
+	if (!notificationChannel?.isTextBased() || !("send" in notificationChannel)) {
+		throw new Error("BOT_NOTIFICATION_CHANNEL is not a text channel");
+	}
+
+	await notificationChannel.send("bot up");
 
 	/*let reactionRolesData: ReactionRolesData[] = [];
 
