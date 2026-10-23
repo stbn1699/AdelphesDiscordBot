@@ -3,6 +3,7 @@ import {generalValues} from "./generalValues";
 import client from "../index";
 import path from "node:path";
 import fs from "node:fs";
+import {dataPath} from "../utils/dataPath";
 import {sendMessage} from "./sendMessage";
 import {TicketArchive} from "../models/ticketArchive";
 
@@ -34,7 +35,7 @@ export async function ticketsCreate(titre: string, user: User) {
 		channel.send(`Bonjour <@${user}>, bienvenue dans votre ticket ! Un.e <@&${process.env.ROLE_MODERATOR}> devrait rapidement te répondre`);
 
 		// Read the existing tickets data
-		const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
+		const ticketsDataPath = dataPath("ticketsData.json");
 		let ticketsData = [];
 		if (!fs.existsSync(ticketsDataPath)) {
 			fs.writeFileSync(ticketsDataPath, JSON.stringify([]));
@@ -78,12 +79,12 @@ export async function ticketsClose(channelName: string) {
 			content: msg.content,
 			date: msg.createdAt.toISOString()
 		}));
-		const archivePath = path.join(__dirname, `${process.env.DATA_LOCATION}/archives/${channelName}.json`);
+		const archivePath = dataPath("archives", `${channelName}.json`);
 		const archiveDir = path.dirname(archivePath);
 		fs.mkdirSync(archiveDir, {recursive: true});
 		fs.writeFileSync(archivePath, JSON.stringify(archive, null, 2));
 
-		const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
+		const ticketsDataPath = dataPath("ticketsData.json");
 		let ticketsData = [];
 		if (fs.existsSync(ticketsDataPath)) {
 			const data = fs.readFileSync(ticketsDataPath, 'utf-8');
@@ -100,7 +101,7 @@ export async function ticketsClose(channelName: string) {
 }
 
 export function getTicketArchive(ticketNumber: number): string {
-	const archivePath = path.join(__dirname, `${process.env.DATA_LOCATION}/archives/ticket-${ticketNumber}.json`);
+	const archivePath = dataPath("archives", `ticket-${ticketNumber}.json`);
 	let archive: TicketArchive[] | null = null;
 	if (fs.existsSync(archivePath)) {
 		archive = JSON.parse(fs.readFileSync(archivePath, 'utf-8'));
@@ -112,7 +113,7 @@ export function getTicketArchive(ticketNumber: number): string {
 }
 
 export function listTickets(): string {
-	const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
+	const ticketsDataPath = dataPath("ticketsData.json");
 	let ticketsData = [];
 	if (fs.existsSync(ticketsDataPath)) {
 		const data = fs.readFileSync(ticketsDataPath, 'utf-8');

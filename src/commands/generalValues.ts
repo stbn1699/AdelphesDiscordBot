@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import {GeneraValues} from "../models/GeneralValues";
-import path from "node:path";
+import {dataPath} from "../utils/dataPath";
 
 export function generalValues() {
-	const generalDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/generalValues.json`);
+	const generalDataPath = dataPath("generalValues.json");
 
 	if (!fs.existsSync(generalDataPath)) {
 		const defaultValues: GeneraValues = {lastTicketNumber: 0};

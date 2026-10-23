@@ -1,0 +1,23 @@
+services:
+  discord-bot:
+    image: adelphes-discord-bot:v1.5
+    container_name: adelphes-discord-bot
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "3009:3009"
+
+    environment:
+      TZ: Europe/Paris
+      MINECRAFT_BRIDGE_PORT: "3009"
+      DATA_LOCATION: /data
+
+    volumes:
+      - ./data:/data
+
+    security_opt:
+      - no-new-privileges:true

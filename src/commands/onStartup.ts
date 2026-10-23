@@ -4,9 +4,10 @@ import {reactionHandler} from "./reactionHandler";
 import {TicketSave} from "../models/TicketSave";
 import {generalValues} from "./generalValues";
 import path from "node:path";
+import {dataPath} from "../utils/dataPath";
 
 export function onStartup(): void {
-	const ticketsDataPath = path.join(__dirname, `${process.env.DATA_LOCATION}/ticketsData.json`);
+	const ticketsDataPath = dataPath("ticketsData.json");
 	const ticketsDataDir = path.dirname(ticketsDataPath);
 
 	// Ensure the directory exists
